@@ -1,0 +1,843 @@
+ ▐▛███▜▌   Claude Code v2.1.143
+▝▜█████▛▘  Sonnet 4.6 · Claude Pro
+  ▘▘ ▝▝    ~/Desktop/Code
+
+✻ Conversation compacted (ctrl+o for history)
+
+  ⎿  Read conversation-history.txt (113 lines)
+  ⎿  Read ../../../.claude/commands/tao-lich-hop-evals.md (48 lines)
+  ⎿  Read ../../../.claude/commands/check-seo-post-evals.md (49 lines)
+  ⎿  Read ../../../.claude/commands/tao-lich-hop.md (116 lines)
+  ⎿  Read ../../../.claude/commands/check-seo-post.md (152 lines)
+
+⏺ Bash(git status && git log --oneline -3)
+  ⎿  On branch main
+     Your branch is up to date with 'origin/main'.
+     … +10 lines (ctrl+o to expand)
+
+⏺ Bash(git add conversation-history.txt && git commit -m "$(cat <<'EOF'
+      Update conversation history with full session summary…)
+  ⎿  [main 036a759] Update conversation history with full session summary
+      1 file changed, 89 insertions(+), 31 deletions(-)
+     To https://github.com/vanphuc89neu-del/claude-code-skills.git
+        274887b..036a759  main -> main
+
+⏺ conversation-history.txt đã được commit và push lên GitHub thành công. Commit
+  036a759 — repo hiện tại đã cập nhật đầy đủ toàn bộ session.
+
+✻ Churned for 2m 24s
+
+❯ Kiểm tra lại 3 skill có lộ thông tin gì bí mật không kiểu mcp chẳng hạn       
+
+⏺ Đọc cả 3 skill files để kiểm tra.
+
+  Read 3 files (ctrl+o to expand)
+
+⏺ Kết quả scan — phát hiện 2 vấn đề, mức độ khác nhau:
+
+  ---
+  Vấn đề 1 — NGHIÊM TRỌNG: Email cá nhân hardcode trong tao-lich-hop.md
+
+  nguyenvanphuc@seongon.com xuất hiện 5 lần trong file này:
+  - Line 3: frontmatter description
+  - Line 9: phần mô tả skill
+  - Line 29: Default settings table
+  - Line 74: pipeline bước 4
+  - Lines 99 & 105: anti-patterns + tiêu chí chất lượng
+
+  File này đang public trên GitHub — email bị lộ hoàn toàn, có thể bị crawl bởi
+  spam bots.
+
+  ---
+  Vấn đề 2 — CẦN XEM XÉT: Checklist nội bộ SEONGON lên public repo
+
+  File seongon-seo-checklist.md (53 tiêu chí chuẩn đăng bài) là tài liệu nội bộ
+  của công ty, hiện đang public trên GitHub. Tùy mức độ bảo mật của công ty —
+  nếu đây là quy trình độc quyền thì nên remove hoặc để repo private.
+
+  ---
+  MCP tool names (mcp__claude_ai_Ahrefs__serp-overview,
+  mcp__claude_ai_Google_Calendar__create_event) — không phải vấn đề. Đây chỉ là
+  identifier của tool, không chứa API key hay credential.
+
+  ---
+  Bạn muốn tôi xử lý thế nào?
+  1. Xóa email khỏi tao-lich-hop.md trên GitHub (thay bằng placeholder
+  YOUR_EMAIL@domain.com)
+  2. Remove seongon-seo-checklist.md khỏi repo, hoặc giữ nguyên
+  3. Cả hai
+
+✻ Churned for 29s
+
+❯ Không cần... Các vấn đề đều oki... Kiểm tra lại cho tôi cấu trúc github bạn   
+  gửi lên                                                                       
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Cấu trúc trên GitHub hiện tại:
+
+  claude-code-skills/
+  ├── README.md
+  ├── conversation-history.txt
+  └── .claude/
+      └── skills/
+          ├── check-top-10.md
+          ├── check-top-10-evals.md
+          ├── check-seo-post.md
+          ├── check-seo-post-evals.md
+          ├── seongon-seo-checklist.md
+          ├── tao-lich-hop.md
+          └── tao-lich-hop-evals.md
+
+  Tổng cộng 9 files. Mỗi skill có 1 file chính + 1 file evals đi kèm,
+  seongon-seo-checklist.md là data file dùng chung cho check-seo-post.
+
+✻ Crunched for 7s
+
+❯ Trong các skill không có cấu trúc như này à?[Image #1]... Tôi nhớ             
+  check-seo-post có checklist mà... Sao nó lại nằm song song nhau... Tưởng      
+  checklist là con của check-seo-post chứ                                       
+  ⎿  [Image #1]
+
+⏺ Đúng rồi — cấu trúc tiêu chuẩn là mỗi skill nằm trong folder riêng, các file
+  companion (checklist, evals) là con của folder đó. Hiện tại repo đang flat,
+  tất cả nằm song song.
+
+  Cấu trúc đúng phải là:
+
+  .claude/skills/
+  ├── check-top-10/
+  │   ├── SKILL.md
+  │   └── evals.md
+  ├── check-seo-post/
+  │   ├── SKILL.md
+  │   ├── seongon-seo-checklist.md   ← con của check-seo-post
+  │   └── evals.md
+  └── tao-lich-hop/
+      ├── SKILL.md
+      └── evals.md
+
+  Tôi sẽ reorganize repo theo đúng cấu trúc này. Lưu ý: phần ~/.claude/commands/
+   giữ nguyên flat vì Claude Code đọc global commands theo kiểu đó — chỉ
+  reorganize phần GitHub repo.
+
+⏺ Bash(mkdir -p .claude/skills/check-top-10 .claude/skills/check-seo-post
+      .claude/skills/tao-lich-hop)
+  ⎿  Done
+
+⏺ Bash(mv .claude/skills/check-top-10.md .claude/skills/check-top-10/SKILL.md &&
+       mv .claude/skills/check-top-10-evals.md
+      .claude/skills/check-top-10/evals.md && mv .cl…)
+  ⎿  Done
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Cấu trúc đúng rồi. Push lên GitHub.
+
+⏺ Bash(git add -A && git commit -m "$(cat <<'EOF'
+      Reorganize skills into folder-per-skill structure…)
+  ⎿  [main 78e2adc] Reorganize skills into folder-per-skill structure
+      7 files changed, 0 insertions(+), 0 deletions(-)
+      rename .claude/skills/{check-seo-post.md => check-seo-post/SKILL.md}
+     … +15 lines (ctrl+o to expand)
+
+⏺ Done. Cấu trúc trên GitHub giờ là:
+
+  .claude/skills/
+  ├── check-top-10/
+  │   ├── SKILL.md
+  │   └── evals.md
+  ├── check-seo-post/
+  │   ├── SKILL.md
+  │   ├── seongon-seo-checklist.md
+  │   └── evals.md
+  └── tao-lich-hop/
+      ├── SKILL.md
+      └── evals.md
+
+  seongon-seo-checklist.md giờ nằm trong folder check-seo-post đúng như chuẩn —
+  companion file là con của skill, không còn nằm song song nữa.
+
+✻ Cogitated for 39s
+❯ cập nhật nốt nội dung của đoạn chát này lên nhé                               
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(claude-code-skills/conversation-history.txt)
+  ⎿  Added 35 lines, removed 8 lines
+       81     Commit: 274887b — "Refactor 3 skills theo tiêu chuẩn create
+           -skill"
+       82     6 files changed, 376 insertions, 232 deletions
+       83  
+       84 +10. KIỂM TRA BẢO MẬT 3 SKILLS                                 
+       85 +    Scan toàn bộ skill files — phát hiện 2 vấn đề:            
+       86 +    - NGHIÊM TRỌNG: nguyenvanphuc@seongon.com hardcode 5 lần t
+          +rong tao-lich-hop.md                                          
+       87 +    - CẦN XEM XÉT: seongon-seo-checklist.md (checklist nội bộ)
+          + đang public trên GitHub                                      
+       88 +    - MCP tool names KHÔNG phải vấn đề (chỉ là identifier, khô
+          +ng chứa credential)                                           
+       89 +    → User xác nhận: tất cả đều ổn, không cần chỉnh           
+       90 +                                                              
+       91 +11. REORGANIZE CẤU TRÚC GITHUB THEO CHUẨN FOLDER-PER-SKILL    
+       92 +    Phát hiện: repo đang flat, tất cả file nằm song song trong
+          + .claude/skills/                                              
+       93 +    Chuẩn đúng: mỗi skill có folder riêng, companion files là 
+          +con của folder đó                                             
+       94 +    Commit: 78e2adc — "Reorganize skills into folder-per-skill
+          + structure"                                                   
+       95 +                                                              
+       96  ==========================================================
+       85 -CẤU TRÚC FILE CUỐI CÙNG (~/.claude/commands/)                 
+       97 +CẤU TRÚC FILE CUỐI CÙNG                                       
+       98  ==========================================================
+       99  
+       88 -check-top-10.md          — SKILL: phân tích SERP top 10       
+       89 -check-top-10-evals.md    — EVALS: 3 test scenarios            
+       90 -check-seo-post.md        — SKILL: audit bài viết 53 tiêu chí  
+       91 -check-seo-post-evals.md  — EVALS: 3 test scenarios            
+       92 -seongon-seo-checklist.md — DATA: 53 tiêu chí chuẩn SEONGON (re
+          -ference)                                                      
+       93 -tao-lich-hop.md          — SKILL: tạo lịch họp Google Calendar
+       94 -tao-lich-hop-evals.md    — EVALS: 3 test scenarios            
+      100 +~/.claude/commands/ (global commands — flat, Claude Code yêu c
+          +ầu)                                                           
+      101 +  check-top-10.md                                             
+      102 +  check-top-10-evals.md                                       
+      103 +  check-seo-post.md                                           
+      104 +  check-seo-post-evals.md                                     
+      105 +  seongon-seo-checklist.md                                    
+      106 +  tao-lich-hop.md                                             
+      107 +  tao-lich-hop-evals.md                                       
+      108  
+      109 +GitHub repo (.claude/skills/ — folder-per-skill)              
+      110 +  check-top-10/                                               
+      111 +    SKILL.md         — SKILL: phân tích SERP top 10           
+      112 +    evals.md         — EVALS: 3 test scenarios                
+      113 +  check-seo-post/                                             
+      114 +    SKILL.md         — SKILL: audit bài viết 53 tiêu chí      
+      115 +    seongon-seo-checklist.md — DATA: 53 tiêu chí chuẩn SEONGON
+      116 +    evals.md         — EVALS: 3 test scenarios                
+      117 +  tao-lich-hop/                                               
+      118 +    SKILL.md         — SKILL: tạo lịch họp Google Calendar    
+      119 +    evals.md         — EVALS: 3 test scenarios                
+      120 +                                                              
+      121  ==========================================================
+      122  VALIDATION REPORT CUỐI
+      123  ==========================================================
+     ...
+      135  - render-data-table của Ahrefs hay bị từ chối permission — fal
+           lback markdown table
+      136  - Google Sheets export CSV cần auth — dùng mcp__claude_ai_Goog
+           le_Drive__read_file_content
+      137  - gh CLI không có sẵn trên macOS — cài qua: brew install gh
+      138 +- Global commands (~/.claude/commands/) phải flat — Claude Cod
+          +e không đọc subfolder                                         
+      139 +- GitHub repo dùng folder-per-skill để đúng chuẩn create-skill
+          +; companion files là con của skill folder                     
+
+⏺ Bash(git add conversation-history.txt && git commit -m "$(cat <<'EOF'
+      Update conversation history: security scan + folder restructure…)
+  ⎿  [main 39064df] Update conversation history: security scan + folder res
+     tructure
+      1 file changed, 35 insertions(+), 8 deletions(-)
+     … +2 lines (ctrl+o to expand)
+
+⏺ Done. Commit 39064df đã push. File conversation-history.txt bây giờ có thêm 2
+  mục mới:
+
+  - Mục 10: Kiểm tra bảo mật 3 skills + kết quả scan
+  - Mục 11: Reorganize folder-per-skill structure
+
+  Và phần "Cấu trúc file cuối cùng" đã được cập nhật để phản ánh đúng 2 tầng:
+  flat cho ~/.claude/commands/ và folder-per-skill cho GitHub repo.
+
+✻ Cogitated for 30s
+
+❯ [Image #2] làm sao để nó xuất hiẹn trong này                                  
+  ⎿  [Image #2]
+
+⏺ Đây là interface của claude.ai web — khác với Claude Code CLI (terminal).
+  Skills bạn tạo hiện đang ở ~/.claude/commands/ chỉ hoạt động trong Claude Code
+   CLI.
+
+  Để skills xuất hiện trong / picker của claude.ai web như trong ảnh, có 2 cách:
+
+  ---
+  Cách 1 — Dùng Claude Projects (Web)
+  1. Vào claude.ai → tạo 1 Project
+  2. Trong Project → Add content → upload file SKILL.md
+  3. Skill sẽ xuất hiện dưới dạng context, gọi bằng / hoặc nhắc tên trực tiếp
+
+  Tuy nhiên đây không phải slash command thực sự — chỉ là file context.
+
+  ---
+  Cách 2 — Slash commands trong Projects (nếu tài khoản có)
+  Một số tài khoản claude.ai (Pro/Team/Enterprise) có tính năng Project 
+  Instructions + Custom commands. Để skill xuất hiện như ahrefs-seo-report và
+  skill-creator trong ảnh của bạn:
+  - Skill phải được admin organization thêm vào qua Settings → Projects →
+  Commands
+  - Hoặc đây là tính năng của Claude for Work (Enterprise)
+
+  ---
+  Thực tế: Skills bạn đang thấy trong ảnh (ahrefs-seo-report, skill-creator) có
+  thể được tạo bởi admin team SEONGON qua org-level settings, không phải cá nhân
+   tự thêm được.
+
+  Bạn đang dùng tài khoản cá nhân hay team/enterprise của SEONGON?
+
+✻ Churned for 26s
+
+❯ Ý tôi là có 3 skill tôi vừa tạoi. Thì làm sao để sử dụng trên claude chat     
+  được... Tôi đang tạo 3 kill đó trong claude code                              
+
+⏺ 3 skill đó chỉ chạy được trong Claude Code (terminal hoặc desktop app) — không
+   sync tự động sang claude.ai web chat.
+
+  Cách dùng trong Claude Code:
+
+  Mở terminal, chạy claude để vào Claude Code, sau đó gõ:
+  /check-top-10 "dịch vụ seo"
+  /check-seo-post https://seongon.com/blog/... "bài viết chuẩn SEO"
+  /tao-lich-hop Họp Q3 | 25/05/2026 14:00 | | abc@gmail.com
+
+  Nếu gõ / mà không thấy 3 skill xuất hiện trong picker → restart Claude Code
+  (thoát hoàn toàn rồi mở lại) để nó load lại ~/.claude/commands/.
+
+  ---
+  Còn muốn dùng trên claude.ai web chat thì không có cách trực tiếp. Workaround
+  duy nhất là tạo 1 Project trên claude.ai → đính kèm file SKILL.md vào Project
+  Instructions → gọi bằng cách nhắc tên, không phải slash command.
+
+  Bạn đang dùng Claude Code trên terminal hay desktop app?
+
+✻ Sautéed for 26s
+
+❯ Hướng dẫn tôi cách đưa các skill trong claude code sang claude cha            
+
+⏺ Skill(claude-code-guide)
+  ⎿  Initializing…
+  ⎿  Error: Unknown skill: claude-code-guide
+
+⏺ Claude Code skills và claude.ai web là 2 hệ thống riêng biệt — không có cách
+  sync trực tiếp. Nhưng có thể tái tạo tương đương qua Projects trên claude.ai:
+
+  ---
+  Cách đưa skill vào claude.ai web
+
+  Bước 1 — Tạo Project
+
+  - Vào claude.ai → click Projects (sidebar trái)
+  - Tạo project mới, ví dụ: "SEO Tools"
+
+  Bước 2 — Thêm skill vào Project Knowledge
+
+  - Trong Project → Add content
+  - Upload 3 file SKILL.md từ GitHub repo (hoặc paste nội dung trực tiếp)
+  - Claude sẽ đọc và nhớ nội dung các skill này trong suốt Project
+
+  Bước 3 — Gọi skill bằng tên
+
+  Trong chat của Project, gọi bằng cách nhắc tên:
+  /check-top-10 "dịch vụ seo"
+  check top 10 cho từ khóa "dịch vụ seo"
+
+  ---
+  Sự khác biệt quan trọng
+
+  ┌──────────┬───────────────────────────────┬──────────────────────────────┐
+  │          │        Claude Code CLI        │      claude.ai Projects      │
+  ├──────────┼───────────────────────────────┼──────────────────────────────┤
+  │ Lưu ở    │ ~/.claude/commands/ (máy      │ Project Knowledge (cloud)    │
+  │ đâu      │ local)                        │                              │
+  ├──────────┼───────────────────────────────┼──────────────────────────────┤
+  │ Gọi bằng │ /tên-skill (slash command     │ Nhắc tên hoặc / nếu được     │
+  │          │ thật)                         │ index                        │
+  ├──────────┼───────────────────────────────┼──────────────────────────────┤
+  │ MCP      │ Dùng được đầy đủ              │ Không có Ahrefs/Calendar MCP │
+  │ tools    │                               │                              │
+  └──────────┴───────────────────────────────┴──────────────────────────────┘
+
+  ---
+  Hạn chế lớn nhất
+
+  check-top-10 và tao-lich-hop sẽ không chạy đúng trên claude.ai web vì cần
+  Ahrefs MCP và Google Calendar MCP — các MCP này chỉ hoạt động trong Claude
+  Code.
+
+  Chỉ có check-seo-post là có thể chạy tương đối trên web (dùng WebFetch để
+  crawl URL, không cần MCP đặc biệt).
+
+✻ Churned for 46s
+
+❯ Điêu Ahref MCP kết nối trên claude chat đó chứ. Sau đó calude code mới dùng   
+  được                                                                          
+
+⏺ Đúng rồi, bạn nói đúng — xin lỗi vì thông tin sai ở trên. MCP (Ahrefs, Google
+  Calendar) được kết nối trên claude.ai web và Claude Code dùng lại từ đó, không
+   phải ngược lại.
+
+  Vậy thì cả 3 skill đều có thể chạy trên claude.ai web vì MCP đã sẵn có ở đó
+  rồi.
+
+  ---
+  Cách đúng để dùng 3 skill trên claude.ai web
+
+  Bước 1 — Tạo Project trên claude.ai
+
+  - Vào claude.ai → Projects → New project
+
+  Bước 2 — Upload 3 file SKILL.md vào Project Knowledge
+
+  Lấy từ GitHub repo hoặc từ local:
+  - check-top-10/SKILL.md
+  - check-seo-post/SKILL.md + seongon-seo-checklist.md
+  - tao-lich-hop/SKILL.md
+
+  Bước 3 — Gọi skill trong Project chat
+
+  /check-top-10 "dịch vụ seo"
+  /check-seo-post https://seongon.com/... "bài viết chuẩn SEO"
+  /tao-lich-hop Họp Q3 | 25/05/2026 14:00 | | abc@gmail.com
+
+  Claude sẽ đọc SKILL.md từ Project Knowledge, dùng Ahrefs/Calendar MCP đã kết
+  nối sẵn, và chạy đúng pipeline.
+
+  ---
+  Slash command / có hiện đúng tên skill trong picker hay không còn phụ thuộc
+  vào plan (Pro/Team), nhưng gọi bằng tên trong chat là đủ để skill chạy.
+
+✻ Brewed for 15s
+
+❯ à... Phải tự xây lại... KHông đồng bộ                                         
+
+⏺ Đúng — không có sync tự động. Phải tự upload thủ công vào Project Knowledge
+  mỗi khi muốn dùng trên web.
+
+  Workflow thực tế sẽ là:
+  - Phát triển + test skill → trong Claude Code (có MCP đầy đủ, có slash command
+   thật)
+  - Dùng hàng ngày trên web → upload SKILL.md vào Project, gọi bằng tên
+
+  Nếu sau này bạn update skill (v3, v4...) thì cũng phải vào Project re-upload
+  file mới — khá thủ công. Đó là lý do Claude Code vẫn là môi trường chính để
+  dùng skill.
+
+✻ Baked for 6s
+
+[Image #1]
+
+❯ Ơ... Rõ ràng xem được lịch sử của claude terminal mà... và trong claude -r    
+  tôi cũng xem được lịch sử của nhau mà... Lịch sử 2 phần này có gì khác nhau?  
+
+⏺ À đúng rồi — lịch sử được sync qua tài khoản Anthropic. Đây là điểm khác nhau:
+
+  ---
+  Lịch sử — cùng 1 nguồn, 2 cách truy cập
+
+  ┌───────────────┬──────────────────────────────┬───────────────────────────┐
+  │               │   Claude Code (claude -r)    │       claude.ai web       │
+  ├───────────────┼──────────────────────────────┼───────────────────────────┤
+  │ Xem lịch sử   │ Có — resume session cũ       │ Có — xem transcript       │
+  ├───────────────┼──────────────────────────────┼───────────────────────────┤
+  │ Tiếp tục chat │ Có — gõ tiếp trong terminal  │ Có — gõ tiếp trên web     │
+  ├───────────────┼──────────────────────────────┼───────────────────────────┤
+  │ Chạy skill    │ Có — MCP, file system đầy đủ │ Không — thiếu local tools │
+  ├───────────────┼──────────────────────────────┼───────────────────────────┤
+  │ Lưu ở đâu     │ Sync lên Anthropic account   │ Đọc từ Anthropic account  │
+  └───────────────┴──────────────────────────────┴───────────────────────────┘
+
+  ---
+  Ý nghĩa thực tế
+
+  Lịch sử đồng bộ 2 chiều — bắt đầu trên terminal, tiếp tục trên web được và
+  ngược lại. Nhưng khi tiếp tục trên web:
+  - Chat bình thường: hoạt động
+  - Gọi /check-top-10 → Claude hiểu skill nhưng không gọi được Ahrefs MCP (vì
+  MCP chạy ở local/terminal)
+
+  Vậy nên nếu muốn dùng skill đầy đủ, vẫn phải mở Claude Code terminal dù đang
+  xem history trên web.
+
+❯ /check-top-10 dịch vụ seo                                                     
+⏺ Bắt đầu pipeline — load schema Ahrefs trước.
+
+  Called Ahrefs (ctrl+o to expand)
+
+⏺ Đủ dữ liệu — bắt đầu phân tích.
+
+  ---
+  Top 10 SERP — "dịch vụ seo" (vn)
+
+  ┌─────┬─────────────────────┬───────────────────┬─────┬─────────┬─────────┐
+  │  #  │       Domain        │       Title       │ DR  │ Traffic │  Ref    │
+  │     │                     │                   │     │         │ Domains │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Dịch Vụ Seo Từ    │     │         │         │
+  │ 1   │ buffseo.com         │ Khóa Website Tổng │ 8   │ 14,208  │ 16      │
+  │     │                     │  Thể Chuyên       │     │         │         │
+  │     │                     │ Nghiệp...         │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Dịch Vụ Seo       │     │         │         │
+  │ 2   │ mona.media          │ Website Tổng Thể  │ 70  │ 7,146   │ 498     │
+  │     │                     │ Từ Khóa Uy Tín... │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Dịch vụ SEO tổng  │     │         │         │
+  │ 3   │ vienit.org          │ thể Overall, SEO  │ 26  │ 1,209   │ 9       │
+  │     │                     │ từ khóa uy tín    │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ DỊCH VỤ SEO TỔNG  │     │         │         │
+  │ 4   │ seotop.com.vn       │ THỂ WEBSITE ™ |   │ 32  │ 5,176   │ 282     │
+  │     │                     │ CÔNG TY DỊCH      │     │         │         │
+  │     │                     │ VỤ...             │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Dịch Vụ SEO       │     │         │         │
+  │ 5   │ foogleseo.com       │ Website Tổng Thể, │ 13  │ 4,860   │ 14      │
+  │     │                     │  Từ Khóa TPHCM,   │     │         │         │
+  │     │                     │ TOP...            │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Dịch vụ SEO       │     │         │         │
+  │ 6   │ seotoro.vn          │ website tổng thể  │ 6   │ 344     │ 2       │
+  │     │                     │ uy tín tốt theo   │     │         │         │
+  │     │                     │ năm tháng         │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Dịch Vụ SEO Giá   │     │         │         │
+  │ 7   │ scapbot.com         │ Rẻ 99% Từ Khóa    │ 29  │ 1,777   │ 107     │
+  │     │                     │ Website lên TOP   │     │         │         │
+  │     │                     │ Bền...            │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Dịch Vụ Seo Tổng  │     │         │         │
+  │ 8   │ dichvuseotongthe.vn │ Thể Từ Khóa       │ 25  │ 69      │ 94      │
+  │     │                     │ Website TPHCM —   │     │         │         │
+  │     │                     │ HEROSEO           │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │     │                     │ Đào Tạo Seo TPHCM │     │         │         │
+  │ 9   │ buffseo.com         │  Chuyên Nghiệp    │ 8   │ 3,669   │ 386     │
+  │     │                     │ Trường Phái       │     │         │         │
+  │     │                     │ SOLO...           │     │         │         │
+  ├─────┼─────────────────────┼───────────────────┼─────┼─────────┼─────────┤
+  │ 10  │ gtvseo.com          │ (title không lấy  │ N/A │ N/A     │ N/A     │
+  │     │                     │ được)             │     │         │         │
+  └─────┴─────────────────────┴───────────────────┴─────┴─────────┴─────────┘
+
+  ---
+  Phân tích trùng lặp
+
+  1. Tiêu đề
+
+  Trùng hoàn toàn: Không có
+
+  Trùng cụm từ:
+
+  ┌────────────────────┬─────────────┬───────┬────────────────┐
+  │       Cụm từ       │ Số title có │ Tỷ lệ │   Các vị trí   │
+  ├────────────────────┼─────────────┼───────┼────────────────┤
+  │ "tổng thể"         │ 7/9         │ 78%   │ #1,2,3,4,5,6,8 │
+  ├────────────────────┼─────────────┼───────┼────────────────┤
+  │ "website tổng thể" │ 6/9         │ 67%   │ #1,2,4,5,6,8   │
+  ├────────────────────┼─────────────┼───────┼────────────────┤
+  │ "từ khóa"          │ 5/9         │ 56%   │ #1,2,3,5,8     │
+  ├────────────────────┼─────────────┼───────┼────────────────┤
+  │ "uy tín"           │ 3/9         │ 33%   │ #2,3,6         │
+  ├────────────────────┼─────────────┼───────┼────────────────┤
+  │ "TPHCM"            │ 2/9         │ 22%   │ #5,8           │
+  └────────────────────┴─────────────┴───────┴────────────────┘
+
+  Domain xuất hiện nhiều lần: buffseo.com — vị trí #1 và #9 (2 URL khác nhau)
+
+  ---
+  2. Nội dung
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │   Mức    │                          Các trang                           │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ Cao      │ buffseo.com (#1 + #9) — cùng domain, 2 slug khác nhau        │
+  │          │ (dich-vu-seo vs dao-tao-seo)                                 │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ Trung    │ #1,2,3,4,5,6,8 — khác domain nhưng cùng góc "SEO tổng thể    │
+  │ bình     │ website từ khóa"                                             │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ Thấp     │ scapbot.com (#7) góc "giá rẻ 99%"; buffseo.com #9 góc "đào   │
+  │          │ tạo"                                                         │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  ---
+  Kết luận & Cơ hội
+
+  - Góc độ còn bỏ trống: Không có trang nào khai thác góc "kết quả/ROI cụ thể"
+  (tăng bao nhiêu %, bao lâu lên top) — 7/9 trang đang chạy cùng công thức "tổng
+   thể + từ khóa + uy tín"
+  - Điểm yếu đối thủ: buffseo.com DR=8 đang giữ vị trí #1 với traffic 14,208 —
+  thị trường này backlink không quyết định thứ hạng, content và on-page mới là
+  yếu tố chính; seotoro.vn DR=6 xếp #6 nhưng traffic chỉ 344 — điểm yếu rõ ràng
+  - Nên tránh: Công thức title "Dịch Vụ SEO Tổng Thể Website Từ Khóa" đã bão hòa
+   78% — vào với title này sẽ chìm trong đám đông ngay lập tức
+
+✻ Cooked for 1m 11s
+
+❯ /check-seo-post https://seongon.com/blog/seo/viet-bai-chuan-seo.html viét bài 
+ chuẩn seo                                                                      
+
+⏺ Bước 1 — Input: URL + từ khóa "viết bài chuẩn SEO". Load checklist và fetch
+  URL song song.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bước 3 — Fetch URL.
+
+⏺ Fetch(https://seongon.com/blog/seo/viet-bai-chuan-seo.html)
+  ⎿  Received 684.5KB (200 OK)
+
+⏺ Đủ dữ liệu — đánh giá 53 tiêu chí.
+
+  ---
+  Kết quả kiểm tra SEO
+
+  URL: https://seongon.com/blog/seo/viet-bai-chuan-seo.html
+  Từ khóa chính: viết bài chuẩn SEO
+
+  ---
+  Tổng điểm: 92/100
+
+  ▎ 36 PASS | 3 FAIL | 14 cần kiểm tra thủ công
+  ▎ (điểm tự động = 36 / (53−14) × 100 = 92)
+
+  ---
+  Điểm tốt
+
+  Nhóm 2–3 — H1 & Meta Title
+
+  - 2.1 H1 < 65 ký tự — H1 = 63 ký tự: "Cách tạo bài viết chuẩn SEO tán đổ khách
+   hàng, đối thủ, Google"
+  - 2.2 H1 đúng insight — chứa từ khóa chính + yếu tố cảm xúc mạnh
+  - 3.1 Meta title = 56 ký tự, đạt chuẩn < 65
+  - 3.2 Meta title chứa từ khóa "viết bài chuẩn SEO"
+  - 3.3 Có yếu tố click: "7 Bước", "34 checklist", "[2025]"
+
+  Nhóm 4 — Meta Description
+
+  - 4.1 Meta desc có hook hấp dẫn, đặt vấn đề đúng insight người tìm
+  - 4.2 Tóm tắt được tinh thần bài
+  - 4.3 Chứa từ khóa chính "Bài viết chuẩn SEO" ngay câu đầu
+
+  Nhóm 5 — Sapo
+
+  - 5.2 Từ khóa chính xuất hiện ngay trong ký tự đầu tiên của sapo
+  - 5.4 Từ khóa chính được bold: "Bài viết chuẩn SEO"
+  - 5.1/5.3/5.5 Sapo có hook, chứa từ khóa phụ "Content SEO", câu độ dài hợp lý
+
+  Nhóm 6–10 — Trình bày & Cấu trúc
+
+  - 6.2/6.5 Có bold xuyên suốt + nhiều highlight boxes
+  - 8.1/8.2 Câu nối đầy đủ giữa heading và danh sách
+  - 10.1 Có đủ H1, H2, H3 (3 cấp heading)
+  - 10.2 H2 chứa từ khóa: "Cách viết bài viết chuẩn SEO với 7+ bước", "Vậy bài
+  viết chuẩn SEO là gì?"
+
+  Nhóm 13–14 — Links
+
+  - 13.1 20+ internal links phân bổ toàn bài
+  - 14.1/14.2 External link đến developers.google.com — nguồn uy tín, đúng chuẩn
+   dẫn chứng
+
+  ---
+  Điểm cần cải thiện
+
+  ID: 4.4
+  Tiêu chí: Meta desc 120–160 ký tự
+  Vấn đề cụ thể: Meta description = 328 ký tự, gấp đôi giới hạn
+  Cách sửa: Cắt xuống còn 130–155 ký tự — giữ câu đầu "Bài viết chuẩn SEO luôn
+    là..." và kết bằng CTA ngắn
+  ────────────────────────────────────────
+  ID: 6.4
+  Tiêu chí: Đoạn ngắn 2–3 câu
+  Vấn đề cụ thể: Phần giải thích "flow nội dung" có đoạn 4–5 câu liên tiếp
+  Cách sửa: Tách đoạn dài thành 2 đoạn riêng, mỗi đoạn ≤ 3 câu
+  ────────────────────────────────────────
+  ID: 15.1
+  Tiêu chí: Từ khóa chính trong 150 ký tự cuối
+  Vấn đề cụ thể: Đoạn kết chỉ có "dịch vụ SEO" và "chiến lược làm SEO", thiếu
+    "viết bài chuẩn SEO"
+  Cách sửa: Thêm một câu tổng kết trước CTA: "Áp dụng 7 bước viết bài chuẩn SEO
+    trên đây..."
+
+  ---
+  Cần kiểm tra thủ công
+
+  ┌──────┬─────────────────────────┬────────────────────────────────────────┐
+  │  ID  │        Tiêu chí         │        Công cụ / Cách kiểm tra         │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 1.1  │ Tỷ lệ unique < 10%      │ Quetext.com — paste toàn bộ nội dung   │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 6.1  │ Căn lề 2 bên (justify)  │ DevTools → Inspect body text → kiểm    │
+  │      │                         │ tra text-align: justify                │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 11.1 │ Mật độ từ khóa 1–3%     │ Surfer SEO hoặc đếm thủ công: Ctrl+F   │
+  │      │                         │ "viết bài chuẩn SEO" ÷ tổng từ         │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 12.1 │ Ảnh nét, chất lượng cao │ Xem trực tiếp trên trình duyệt         │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 12.2 │ Vị trí ảnh phù hợp ngữ  │ Đọc bài + quan sát ảnh đặt cạnh đoạn   │
+  │      │ cảnh                    │ nào                                    │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 12.3 │ Caption ảnh phù hợp     │ Kiểm tra bên dưới mỗi ảnh trên trang   │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 12.4 │ ALT text chứa từ khóa   │ Inspect Element → thẻ <img alt="...">  │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 12.5 │ ALT text phù hợp hình   │ Inspect Element — đọc alt text từng    │
+  │      │ ảnh                     │ ảnh                                    │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 12.6 │ Ảnh < 200KB, định dạng  │ DevTools → Network tab → lọc Img       │
+  │      │ WebP/JPG                │                                        │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 16.1 │ OG tags                 │ metatags.io hoặc Facebook Sharing      │
+  │      │ (Facebook/Twitter)      │ Debugger                               │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 17.1 │ Schema đánh giá sao     │ Google Rich Results Test               │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 18.1 │ Nút Like bài viết       │ Xem giao diện trang trực tiếp          │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 19.1 │ Submit URL lên GSC      │ Google Search Console → URL Inspection │
+  ├──────┼─────────────────────────┼────────────────────────────────────────┤
+  │ 20.1 │ Chia sẻ lên MXH         │ Kiểm tra Facebook/LinkedIn page        │
+  │      │                         │ SEONGON                                │
+  └──────┴─────────────────────────┴────────────────────────────────────────┘
+
+  ---
+  Tóm tắt hành động
+
+  ┌─────────┬───────────────────────────────────────────────────────────────┐
+  │ Ưu tiên │                         Việc cần làm                          │
+  ├─────────┼───────────────────────────────────────────────────────────────┤
+  │         │ 4.4 — Cắt meta description từ 328 xuống ≤ 155 ký tự; đây là   │
+  │ Cao     │ trường Google hiển thị trực tiếp trên SERP, ảnh hưởng CTR     │
+  │         │ ngay lập tức                                                  │
+  ├─────────┼───────────────────────────────────────────────────────────────┤
+  │ Cao     │ 15.1 — Thêm cụm "viết bài chuẩn SEO" vào 150 ký tự cuối bài,  │
+  │         │ trước đoạn CTA dịch vụ                                        │
+  ├─────────┼───────────────────────────────────────────────────────────────┤
+  │ Trung   │ 6.4 — Tách các đoạn 4–5 câu ở phần "flow nội dung" — ảnh      │
+  │ bình    │ hưởng đến readability và bounce rate                          │
+  ├─────────┼───────────────────────────────────────────────────────────────┤
+  │ Thấp    │ Kiểm tra ALT text ảnh (12.4/12.5) — dễ sửa, cộng điểm SEO kỹ  │
+  │         │ thuật                                                         │
+  └─────────┴───────────────────────────────────────────────────────────────┘
+
+✻ Worked for 2m 21s
+
+❯ /tao-lich-hop với bạn Phí thanh Huyền (phithanhhuyen@seongon.com) vào sáng    
+ngày mai về kế hoạch R&D đến hết tháng 6 vào 10-11h sáng                        
+
+⏺ Bước 1 — Parse xong:
+  - Tên: Kế hoạch R&D đến hết tháng 6
+  - Thời gian: ngày mai = 19/05/2026, 10:00–11:00 (UTC+7)
+  - Người dự: phithanhhuyen@seongon.com + nguyenvanphuc@seongon.com
+
+  Bước 2 — Load Calendar schema.
+
+⏺ Bước 3–4 — Thời gian đã rõ, tạo sự kiện.
+
+  Called Google Calendar (ctrl+o to expand)
+
+⏺ Google Calendar đang kết nối nhưng thiếu quyền ghi (write scope). Hiện tại chỉ
+   có quyền đọc lịch, chưa có quyền tạo event.
+
+  Cách fix:
+
+  Gõ /mcp trong Claude Code → tìm claude.ai Google Calendar → Disconnect → kết
+  nối lại → khi OAuth hiện lên, chắc chắn tích chọn quyền "Create and edit 
+  events" (hoặc tương đương).
+
+  Sau khi re-auth xong, gọi lại /tao-lich-hop với đúng thông tin này và tôi sẽ
+  tạo ngay.
+
+✻ Sautéed for 39s
+
+❯ /tao-lich-hop với bạn Phí thanh Huyền (phithanhhuyen@seongon.com) vào sáng    
+ngày mai về kế hoạch R&D đến hết tháng 6 vào 10-11h sáng                        
+
+⏺ Schema đã có sẵn, tạo event ngay.
+
+  Called Google Calendar (ctrl+o to expand)
+
+⏺ Vẫn lỗi scope — re-auth chưa thành công. Google Calendar đang kết nối ở chế độ
+   read-only, chưa có quyền tạo event.
+
+  Cách re-auth đúng:
+
+  1. Gõ /mcp trong Claude Code
+  2. Tìm Google Calendar → nhấn Disconnect
+  3. Kết nối lại → trình duyệt mở OAuth
+  4. Trong màn hình Google xin quyền, đảm bảo tích "See, edit, share, and 
+  permanently delete all the calendars you can access using Google Calendar"
+  (không chỉ "See")
+  5. Nhấn Allow
+
+  Sau đó gọi lại skill này là được.
+
+✻ Brewed for 15s
+
+❯ /mcp                                                                            ⎿  Reconnected to claude.ai Google Calendar.
+
+❯ ❯ /tao-lich-hop với bạn Phí thanh Huyền (phithanhhuyen@seongon.com) vào sáng  
+  ngày mai về kế hoạch R&D đến hết tháng 6 vào 10-11h sáng                      
+
+  Called Google Calendar (ctrl+o to expand)
+
+⏺ Vẫn bị lỗi scope dù đã reconnect. Vấn đề là Google đã cache token cũ
+  (read-only) — reconnect trong /mcp chỉ dùng lại token cũ, không xin lại quyền
+  mới.
+
+  Cần revoke token Google hoàn toàn:
+
+  1. Vào myaccount.google.com/permissions
+  2. Tìm Claude hoặc Anthropic trong danh sách app
+  3. Nhấn Remove Access
+  4. Quay lại Claude Code → /mcp → kết nối lại Google Calendar
+  5. Lần này Google sẽ hiện màn hình xin quyền mới → tích đủ quyền edit → Allow
+
+  Sau bước đó gọi lại /tao-lich-hop là tạo được.
+
+✻ Cooked for 16s
+
+❯ ❯ /tao-lich-hop với bạn Phí thanh Huyền (phithanhhuyen@seongon.com) vào sáng  
+  ngày mai về kế hoạch R&D đến hết tháng 6 vào 10-11h sáng                      
+
+  Called Google Calendar (ctrl+o to expand)
+
+⏺ Da tao lich hop thanh cong.
+
+  Ten:       Ke hoach R&D den het thang 6
+  Bat dau:   19/05/2026 10:00
+  Ket thuc:  19/05/2026 11:00
+  Nguoi du:  nguyenvanphuc@seongon.com
+             phithanhhuyen@seongon.com
+  Invite:    Da gui email moi den 2 nguoi tham du
+  Link:      https://meet.google.com/qjz-fzgu-ccd
+
+  Google Meet đã được tạo tự động kèm theo event.
+
+✻ Crunched for 11s
+
+❯ Update full (đầy đủ cuộc chat này)... Không tóm tắt, không cắt ngắn file .txt 
+   lên github... File khoảng hơn 3M                                             
+
+⏺ Đọc file hiện tại trước, sau đó viết đầy đủ toàn bộ nội dung session này.
+
+  Read 1 file (ctrl+o to expand)
+  ⎿  Loaded 3 skills from claude-code-skills/.claude/skills
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ Dùng /export thẳng lên nhé                                                    
+
+⏺ /export là built-in command của Claude Code — tôi không thể tự gọi nó thay
+  bạn. Bạn cần gõ trực tiếp trong terminal:
+
+  /export
+
+  Lệnh này sẽ export toàn bộ conversation hiện tại ra file. Sau khi có file
+  export, bạn có thể copy nội dung vào conversation-history.txt và tôi push lên
+  GitHub cho.
+
+✻ Worked for 12s
