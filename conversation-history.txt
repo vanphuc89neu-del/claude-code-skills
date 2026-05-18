@@ -1,54 +1,112 @@
-LỊCH SỬ TRÒ CHUYỆN — TẠO CLAUDE CODE SKILLS
-=============================================
+LỊCH SỬ TRÒ CHUYỆN — TẠO & CHUẨN HÓA CLAUDE CODE SKILLS
+==========================================================
 Ngày: 18/05/2026
 Công cụ: Claude Code (claude-sonnet-4-6)
 Người dùng: nguyenvanphuc@seongon.com
+Repo: https://github.com/vanphuc89neu-del/claude-code-skills
 
-[Để xuất toàn bộ lịch sử hội thoại này, chạy lệnh /export trong Claude Code]
-[File .txt đầy đủ sẽ được tạo và có thể commit vào repo này]
-
-=============================================
-TÓM TẮT CÁC VIỆC ĐÃ THỰC HIỆN
-=============================================
+==========================================================
+TÓM TẮT TOÀN BỘ SESSION
+==========================================================
 
 1. PHÂN TÍCH TOP 10 SERP — "định cư châu âu"
    - Dùng Ahrefs MCP lấy top 10 kết quả tại VN
-   - Phân tích trùng lặp tiêu đề, nội dung
-   - Phát hiện: sigroup.vn xuất hiện 2 lần, 3/10 title dùng "dễ/rẻ nhất"
-   - Kết quả: DR thấp vẫn có thể cạnh tranh nếu on-page tốt
+   - Phân tích trùng lặp: sigroup.vn xuất hiện 2 lần, 3/10 title dùng "dễ/rẻ nhất"
+   - Phát hiện cơ hội: góc "cơ hội/lợi ích cụ thể" gần như bỏ trống
 
-2. TẠO SKILL /check-top-10
+2. TẠO SKILL /check-top-10 (v1)
    - File: ~/.claude/commands/check-top-10.md
-   - Tự động lấy SERP + phân tích trùng lặp title/content
-   - Có phần vết xe đổ và tiêu chí tự kiểm
-
-3. CHẠY THỬ /check-top-10 "dịch vụ seo"
-   - buffseo.com DR=8 nhưng traffic 14,198 → cơ hội on-page
+   - Chạy thử với "dịch vụ seo": buffseo.com DR=8 nhưng traffic 14,198
    - mona.media + monamedia.co cùng 1 công ty chiếm 2/8 vị trí
    - 8/8 title bão hòa cùng công thức "Dịch Vụ SEO Tổng Thể Website"
 
-4. KIỂM TRA BÀI VIẾT — seongon.com/blog/seo/viet-bai-chuan-seo.html
+3. KIỂM TRA BÀI VIẾT — seongon.com/blog/seo/viet-bai-chuan-seo.html
    - Từ khóa: "bài viết chuẩn SEO"
-   - Checklist lấy từ Google Sheets SEONGON (53 tiêu chí)
-   - Kết quả: 32/34 tiêu chí đạt (~78/100 bao gồm N/A)
+   - Lấy checklist từ Google Sheets SEONGON (53 tiêu chí) qua Google Drive MCP
+   - Kết quả thủ công: ~78/100 (32/34 tiêu chí đạt)
    - FAIL: kết bài thiếu từ khóa, H3 thiếu từ khóa
 
-5. TẠO SKILL /check-seo-post
+4. TẠO SKILL /check-seo-post (v1)
    - File: ~/.claude/commands/check-seo-post.md
    - File data: ~/.claude/commands/seongon-seo-checklist.md (53 tiêu chí)
-   - Tự động fetch URL + đánh giá + chấm điểm /100
-
-6. CHẠY THỬ /check-seo-post — cùng bài viết trên
-   - Tổng điểm: 95/100 (36/38 tiêu chí tự động)
+   - Chạy thử: tổng điểm 95/100 (36/38 tiêu chí tự động)
    - FAIL: 6.4 đoạn quá dài (4-5 câu), 14.2 thiếu external link dẫn chứng
-   - 15 tiêu chí cần kiểm tra thủ công (meta desc, ALT, OG tags...)
 
-7. TẠO SKILL /tao-lich-hop
+5. TẠO SKILL /tao-lich-hop (v1)
    - File: ~/.claude/commands/tao-lich-hop.md
    - Dùng Google Calendar MCP tạo event + gửi invite
    - Tự động thêm nguyenvanphuc@seongon.com làm organizer
 
-8. ĐÓNG GÓI LÊN GITHUB
-   - Repo: claude-code-skills
-   - Cấu trúc: .claude/skills/ chứa 4 files skill
-   - README hướng dẫn cài đặt và sử dụng
+6. ĐÓNG GÓI LÊN GITHUB
+   - Cài gh CLI qua Homebrew
+   - Tạo repo local: /Desktop/Code/claude-code-skills/
+   - Cấu trúc: .claude/skills/ chứa skill files + README + conversation-history.txt
+   - Push lên: github.com/vanphuc89neu-del/claude-code-skills
+   - Đổi từ Private → Public
+
+7. SOI CHIẾU VỚI TIÊU CHUẨN create-skill
+   Path chuẩn: /Desktop/Code/seongon-claude-code-training/.claude/skills/create-skill/
+
+   8 hard gates phát hiện FAIL:
+   - Description sai format (không third-person, thiếu ≥5 triggers)
+   - Thiếu section "Khi nào dùng" + "KHÔNG dùng khi"
+   - Thiếu Default settings table
+   - Anti-patterns không có ví dụ BAD cụ thể
+   - tao-lich-hop dùng emoji (vi phạm voice rules)
+   - Không có EVALS.md với 3 scenarios
+
+8. REFACTOR CẢ 3 SKILLS THEO CHUẨN (v2)
+
+   check-top-10.md — fixes:
+   - Description: third-person + 7 trigger phrases VN+EN
+   - Thêm: Khi nào dùng / KHÔNG dùng khi / Default settings
+   - Anti-patterns: thêm ví dụ BAD cụ thể cho từng mục
+   - Data sufficiency gate: không output khi < 5 kết quả
+   - Thêm: check-top-10-evals.md (3 scenarios: Golden/Edge/Anti)
+
+   check-seo-post.md — fixes:
+   - Description: third-person + 6 trigger phrases VN+EN
+   - Thêm: Khi nào dùng / KHÔNG dùng khi / Default settings
+   - Anti-patterns: ví dụ BAD cho từng lỗi hay gặp (PASS giả, ước lượng ký tự)
+   - Thêm: check-seo-post-evals.md (3 scenarios)
+
+   tao-lich-hop.md — fixes:
+   - Description: third-person + 6 trigger phrases VN+EN
+   - Thêm: Khi nào dùng / KHÔNG dùng khi / Default settings
+   - Xóa toàn bộ emoji khỏi output template
+   - Anti-patterns: ví dụ BAD cho lỗi thời gian mơ hồ, bỏ organizer
+   - Thêm: tao-lich-hop-evals.md (3 scenarios)
+
+9. PUSH V2 LÊN GITHUB
+   Commit: 274887b — "Refactor 3 skills theo tiêu chuẩn create-skill"
+   6 files changed, 376 insertions, 232 deletions
+
+==========================================================
+CẤU TRÚC FILE CUỐI CÙNG (~/.claude/commands/)
+==========================================================
+
+check-top-10.md          — SKILL: phân tích SERP top 10
+check-top-10-evals.md    — EVALS: 3 test scenarios
+check-seo-post.md        — SKILL: audit bài viết 53 tiêu chí
+check-seo-post-evals.md  — EVALS: 3 test scenarios
+seongon-seo-checklist.md — DATA: 53 tiêu chí chuẩn SEONGON (reference)
+tao-lich-hop.md          — SKILL: tạo lịch họp Google Calendar
+tao-lich-hop-evals.md    — EVALS: 3 test scenarios
+
+==========================================================
+VALIDATION REPORT CUỐI
+==========================================================
+
+Hard gates: 8/8 PASS
+Content gates: PASS (imperative form, no emoji, no hype)
+Còn 1 gap chấp nhận: naming chưa dạng gerund (giữ để không break workflow)
+
+==========================================================
+GHI CHÚ KỸ THUẬT
+==========================================================
+
+- Ahrefs SERP API không trả về trường "description" — dùng WebFetch để lấy meta desc
+- WebFetch không đọc được <meta> tags trong <head> — cần View Source thủ công
+- render-data-table của Ahrefs hay bị từ chối permission — fallback markdown table
+- Google Sheets export CSV cần auth — dùng mcp__claude_ai_Google_Drive__read_file_content
+- gh CLI không có sẵn trên macOS — cài qua: brew install gh
