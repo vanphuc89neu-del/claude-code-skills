@@ -1,0 +1,54 @@
+LỊCH SỬ TRÒ CHUYỆN — TẠO CLAUDE CODE SKILLS
+=============================================
+Ngày: 18/05/2026
+Công cụ: Claude Code (claude-sonnet-4-6)
+Người dùng: nguyenvanphuc@seongon.com
+
+[Để xuất toàn bộ lịch sử hội thoại này, chạy lệnh /export trong Claude Code]
+[File .txt đầy đủ sẽ được tạo và có thể commit vào repo này]
+
+=============================================
+TÓM TẮT CÁC VIỆC ĐÃ THỰC HIỆN
+=============================================
+
+1. PHÂN TÍCH TOP 10 SERP — "định cư châu âu"
+   - Dùng Ahrefs MCP lấy top 10 kết quả tại VN
+   - Phân tích trùng lặp tiêu đề, nội dung
+   - Phát hiện: sigroup.vn xuất hiện 2 lần, 3/10 title dùng "dễ/rẻ nhất"
+   - Kết quả: DR thấp vẫn có thể cạnh tranh nếu on-page tốt
+
+2. TẠO SKILL /check-top-10
+   - File: ~/.claude/commands/check-top-10.md
+   - Tự động lấy SERP + phân tích trùng lặp title/content
+   - Có phần vết xe đổ và tiêu chí tự kiểm
+
+3. CHẠY THỬ /check-top-10 "dịch vụ seo"
+   - buffseo.com DR=8 nhưng traffic 14,198 → cơ hội on-page
+   - mona.media + monamedia.co cùng 1 công ty chiếm 2/8 vị trí
+   - 8/8 title bão hòa cùng công thức "Dịch Vụ SEO Tổng Thể Website"
+
+4. KIỂM TRA BÀI VIẾT — seongon.com/blog/seo/viet-bai-chuan-seo.html
+   - Từ khóa: "bài viết chuẩn SEO"
+   - Checklist lấy từ Google Sheets SEONGON (53 tiêu chí)
+   - Kết quả: 32/34 tiêu chí đạt (~78/100 bao gồm N/A)
+   - FAIL: kết bài thiếu từ khóa, H3 thiếu từ khóa
+
+5. TẠO SKILL /check-seo-post
+   - File: ~/.claude/commands/check-seo-post.md
+   - File data: ~/.claude/commands/seongon-seo-checklist.md (53 tiêu chí)
+   - Tự động fetch URL + đánh giá + chấm điểm /100
+
+6. CHẠY THỬ /check-seo-post — cùng bài viết trên
+   - Tổng điểm: 95/100 (36/38 tiêu chí tự động)
+   - FAIL: 6.4 đoạn quá dài (4-5 câu), 14.2 thiếu external link dẫn chứng
+   - 15 tiêu chí cần kiểm tra thủ công (meta desc, ALT, OG tags...)
+
+7. TẠO SKILL /tao-lich-hop
+   - File: ~/.claude/commands/tao-lich-hop.md
+   - Dùng Google Calendar MCP tạo event + gửi invite
+   - Tự động thêm nguyenvanphuc@seongon.com làm organizer
+
+8. ĐÓNG GÓI LÊN GITHUB
+   - Repo: claude-code-skills
+   - Cấu trúc: .claude/skills/ chứa 4 files skill
+   - README hướng dẫn cài đặt và sử dụng
