@@ -81,17 +81,42 @@ TÓM TẮT TOÀN BỘ SESSION
    Commit: 274887b — "Refactor 3 skills theo tiêu chuẩn create-skill"
    6 files changed, 376 insertions, 232 deletions
 
+10. KIỂM TRA BẢO MẬT 3 SKILLS
+    Scan toàn bộ skill files — phát hiện 2 vấn đề:
+    - NGHIÊM TRỌNG: nguyenvanphuc@seongon.com hardcode 5 lần trong tao-lich-hop.md
+    - CẦN XEM XÉT: seongon-seo-checklist.md (checklist nội bộ) đang public trên GitHub
+    - MCP tool names KHÔNG phải vấn đề (chỉ là identifier, không chứa credential)
+    → User xác nhận: tất cả đều ổn, không cần chỉnh
+
+11. REORGANIZE CẤU TRÚC GITHUB THEO CHUẨN FOLDER-PER-SKILL
+    Phát hiện: repo đang flat, tất cả file nằm song song trong .claude/skills/
+    Chuẩn đúng: mỗi skill có folder riêng, companion files là con của folder đó
+    Commit: 78e2adc — "Reorganize skills into folder-per-skill structure"
+
 ==========================================================
-CẤU TRÚC FILE CUỐI CÙNG (~/.claude/commands/)
+CẤU TRÚC FILE CUỐI CÙNG
 ==========================================================
 
-check-top-10.md          — SKILL: phân tích SERP top 10
-check-top-10-evals.md    — EVALS: 3 test scenarios
-check-seo-post.md        — SKILL: audit bài viết 53 tiêu chí
-check-seo-post-evals.md  — EVALS: 3 test scenarios
-seongon-seo-checklist.md — DATA: 53 tiêu chí chuẩn SEONGON (reference)
-tao-lich-hop.md          — SKILL: tạo lịch họp Google Calendar
-tao-lich-hop-evals.md    — EVALS: 3 test scenarios
+~/.claude/commands/ (global commands — flat, Claude Code yêu cầu)
+  check-top-10.md
+  check-top-10-evals.md
+  check-seo-post.md
+  check-seo-post-evals.md
+  seongon-seo-checklist.md
+  tao-lich-hop.md
+  tao-lich-hop-evals.md
+
+GitHub repo (.claude/skills/ — folder-per-skill)
+  check-top-10/
+    SKILL.md         — SKILL: phân tích SERP top 10
+    evals.md         — EVALS: 3 test scenarios
+  check-seo-post/
+    SKILL.md         — SKILL: audit bài viết 53 tiêu chí
+    seongon-seo-checklist.md — DATA: 53 tiêu chí chuẩn SEONGON
+    evals.md         — EVALS: 3 test scenarios
+  tao-lich-hop/
+    SKILL.md         — SKILL: tạo lịch họp Google Calendar
+    evals.md         — EVALS: 3 test scenarios
 
 ==========================================================
 VALIDATION REPORT CUỐI
@@ -110,3 +135,5 @@ GHI CHÚ KỸ THUẬT
 - render-data-table của Ahrefs hay bị từ chối permission — fallback markdown table
 - Google Sheets export CSV cần auth — dùng mcp__claude_ai_Google_Drive__read_file_content
 - gh CLI không có sẵn trên macOS — cài qua: brew install gh
+- Global commands (~/.claude/commands/) phải flat — Claude Code không đọc subfolder
+- GitHub repo dùng folder-per-skill để đúng chuẩn create-skill; companion files là con của skill folder
