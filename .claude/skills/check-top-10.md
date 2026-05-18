@@ -1,130 +1,123 @@
 ---
 name: check-top-10
-description: Phân tích top 10 SERP cho một từ khóa — kiểm tra trùng lặp tiêu đề, mô tả và nội dung. Dùng: /check-top-10 "từ khóa"
-argument-hint: '"từ khóa cần phân tích"'
+description: This skill should be used when the user asks to "check top 10", "kiểm tra top 10", "phân tích SERP", "analyze competitors", "xem đối thủ xếp hạng gì", "soi top 10 Google", "/check-top-10 [keyword]", "top 10 cho từ khóa này là ai", or wants to identify duplicate titles, descriptions, and content patterns in Google top 10 results. Queries Ahrefs SERP data and surfaces competitor metrics, duplication risks, and content gaps. Use for any keyword research or competitive analysis task before writing content.
 ---
 
-# /check-top-10 — Phân tích SERP Top 10
+# check-top-10
 
-Nhận `$ARGUMENTS` là từ khóa cần phân tích. Thực hiện **đúng thứ tự** các bước sau.
+Phân tích top 10 kết quả Google cho 1 từ khóa — phát hiện tiêu đề trùng lặp, nội dung trùng lặp, và cơ hội còn bỏ trống. Dành cho SEO specialist cần hiểu nhanh bức tranh cạnh tranh trước khi lên brief nội dung.
 
----
+## Khi nào dùng
 
-## BƯỚC 1 — Lấy dữ liệu SERP (Ahrefs)
+User nói một trong các pattern:
+- `/check-top-10 "từ khóa"`
+- "kiểm tra top 10 [từ khóa]"
+- "phân tích SERP [từ khóa]"
+- "đối thủ đang xếp hạng gì cho [từ khóa]"
+- "check competitors Google [keyword]"
 
-Gọi tool `mcp__claude_ai_Ahrefs__serp-overview` với:
-- `keyword`: lấy từ `$ARGUMENTS` (bỏ dấu ngoặc nếu có)
-- `country`: `vn`
+KHÔNG dùng skill này khi:
+- User muốn audit 1 bài viết cụ thể → dùng `/check-seo-post`
+- User muốn research keyword cluster rộng (>1 từ khóa)
+- Ahrefs MCP chưa kết nối
+
+## Default settings
+
+| Setting | Default | Override khi |
+|---|---|---|
+| Country | `vn` | User chỉ định market khác: "us", "sg", "au"... |
+| Top positions | `10` | User nói "top 5" hoặc "top 20" |
+| Ngôn ngữ output | Tiếng Việt | User giao tiếp hoàn toàn tiếng Anh |
+
+## Pipeline — 4 bước
+
+Theo thứ tự, không skip.
+
+### Bước 1 — Lấy dữ liệu SERP
+
+Load schema nếu chưa có: gọi `ToolSearch` với `select:mcp__claude_ai_Ahrefs__serp-overview`.
+
+Gọi `mcp__claude_ai_Ahrefs__serp-overview` với:
+- `keyword`: từ argument, bỏ dấu ngoặc kép nếu có
+- `country`: `vn` (hoặc override)
 - `top_positions`: `10`
-- `select`: `url,title,position,domain_rating,traffic,backlinks,refdomains,top_keyword,top_keyword_volume,keywords`
+- `select`: `url,title,position,domain_rating,traffic,backlinks,refdomains,keywords`
 
-Lưu toàn bộ kết quả `positions[]` vào bộ nhớ làm việc.
+Lỗi `column not found`: xóa trường lỗi khỏi `select`, gọi lại ngay — không hỏi user.
 
----
+Data sufficiency gate: nếu Ahrefs trả về < 5 kết quả có URL — báo rõ "không đủ dữ liệu để phân tích pattern" và dừng. Không force output.
 
-## BƯỚC 2 — Phân tích tiêu đề trùng lặp
+### Bước 2 — Phân tích tiêu đề trùng lặp
 
-Từ danh sách `positions[]`, kiểm tra:
+**2a. Trùng hoàn toàn**: so sánh từng cặp title — ghi nhận nếu 2 title giống 100%.
 
-**2a. Trùng hoàn toàn:** So sánh từng cặp title — ghi nhận nếu 2 title giống nhau 100%.
+**2b. Trùng cụm từ**: tìm cụm ≥ 3 từ xuất hiện trong ≥ 2 title. Tính tần suất và tỷ lệ %.
 
-**2b. Trùng cụm từ chính:** Tìm các cụm từ ≥ 3 từ xuất hiện trong ≥ 2 title (ví dụ: "định cư Châu Âu dễ nhất").
+**2c. Domain trùng**: đếm số lần mỗi domain xuất hiện trong top 10 — đánh dấu domain có ≥ 2 URL.
 
-**2c. Domain trùng:** Đếm số lần mỗi domain xuất hiện trong top 10 — đánh dấu domain nào có ≥ 2 URL.
+### Bước 3 — Phân tích nội dung trùng lặp
 
----
+Nhóm theo mức độ dựa vào title + URL slug:
 
-## BƯỚC 3 — Lấy meta description (load on-demand)
+| Mức | Tiêu chí |
+|---|---|
+| Cao | Cùng domain + cùng chủ đề |
+| Trung bình | Khác domain + cùng góc tiếp cận |
+| Thấp | Cùng chủ đề rộng + góc khác nhau |
 
-Chỉ fetch khi cần thiết. Với **từng URL** trong top 10, gọi `WebFetch` với prompt:
-```
-Extract ONLY: meta title tag and meta description tag from HTML head. Return exactly:
-TITLE: [content]
-META_DESC: [content]
-```
+### Bước 4 — Xuất kết quả
 
-> Nếu WebFetch bị từ chối hoặc lỗi cho 1 URL, ghi nhận "Không lấy được" và tiếp tục — không dừng toàn bộ quy trình.
-
-Sau khi có kết quả, kiểm tra:
-- Meta description trùng hoàn toàn giữa các trang
-- Meta description quá ngắn (< 50 ký tự) hoặc quá dài (> 160 ký tự)
-- Meta description không chứa từ khóa chính
-
----
-
-## BƯỚC 4 — Phân tích nội dung trùng lặp
-
-Dựa vào title + URL slug để nhóm theo ý nghĩa:
-
-| Mức độ | Tiêu chí |
-|--------|----------|
-| **Cao** | Cùng domain + chủ đề gần nhau |
-| **Trung bình** | Khác domain nhưng title cùng góc độ tiếp cận |
-| **Thấp** | Cùng chủ đề rộng nhưng góc độ khác nhau |
-
----
-
-## BƯỚC 5 — Xuất kết quả
-
-Trình bày theo cấu trúc chuẩn sau (không thêm, không bớt):
+Trình bày đúng cấu trúc sau, không thêm không bớt:
 
 ```
-## Top 10 SERP — "[từ khóa]" (VN)
+## Top 10 SERP — "[từ khóa]" ([country])
 
 | # | Domain | Title | DR | Traffic | Ref Domains |
 |---|--------|-------|----|---------|-------------|
-...
+[10 dòng dữ liệu]
 
 ---
 
 ## Phân tích trùng lặp
 
-### 1. Tiêu đề (Title)
+### 1. Tiêu đề
 - Trùng hoàn toàn: [liệt kê hoặc "Không có"]
-- Trùng cụm từ: [liệt kê nhóm + số lần]
+- Trùng cụm từ: [bảng cụm từ + số lần xuất hiện + tỷ lệ]
 - Domain xuất hiện nhiều lần: [liệt kê hoặc "Không có"]
 
-### 2. Mô tả (Meta Description)
-- Trùng hoàn toàn: [liệt kê hoặc "Không có"]
-- Vấn đề độ dài: [liệt kê URL bị lỗi]
-- Thiếu từ khóa: [liệt kê URL]
-(Ghi rõ nếu không lấy được dữ liệu)
-
-### 3. Nội dung (Content)
-| Mức độ | Các trang |
-|--------|-----------|
-| Cao    | ...       |
-| Trung bình | ...   |
-| Thấp   | ...       |
+### 2. Nội dung
+| Mức | Các trang |
+|---|---|
+| Cao | ... |
+| Trung bình | ... |
+| Thấp | ... |
 
 ---
 
 ## Kết luận & Cơ hội
-
 - Góc độ còn bỏ trống: ...
 - Điểm yếu đối thủ (DR thấp, 0 backlink): ...
-- Nên tránh: ...
+- Nên tránh (đã bão hòa): ...
 ```
 
----
+Nếu `render-data-table` bị từ chối: fallback sang markdown table, không báo lỗi cho user.
 
-## VẾT XE ĐỔ — Lỗi thường gặp
+## Anti-patterns
 
-| Lỗi | Cách xử lý |
-|-----|-----------|
-| `column 'description' not found` | Ahrefs không có trường description — dùng WebFetch thay thế |
-| WebFetch bị từ chối | Ghi "Không lấy được" và tiếp tục, không dừng |
-| Tool schema chưa load | Gọi `ToolSearch` với `select:mcp__claude_ai_Ahrefs__serp-overview` trước |
-| Từ khóa tiếng Việt bị encode sai | Giữ nguyên Unicode, không escape |
-| `render-data-table` bị từ chối | Bỏ qua render, trình bày bằng markdown table thay thế |
+- KHÔNG bịa dữ liệu. BAD: output "Domain X có DR 45" khi chưa fetch. GOOD: ghi "Không lấy được — tool lỗi".
+- KHÔNG bỏ qua mục 2b (cụm từ). BAD: chỉ báo "không có title trùng hoàn toàn" rồi dừng. GOOD: kiểm tra đủ 2a/2b/2c.
+- KHÔNG output khi data < 5. BAD: kết luận từ 2 kết quả Ahrefs trả về. GOOD: báo data sufficiency gate fail.
+- KHÔNG nhầm lẫn meta description với title. BAD: phân tích description khi Ahrefs không trả về trường đó. GOOD: ghi rõ "meta description không có trong SERP data — cần WebFetch riêng".
 
----
+## Tiêu chí chất lượng
 
-## TIÊU CHÍ CHẤT LƯỢNG — Tự kiểm trước khi trả lời
+- [ ] Bảng top 10 có đủ 10 dòng (hoặc ghi rõ lý do thiếu)
+- [ ] Phân tích title có đủ cả 3 mục: trùng hoàn toàn / cụm từ / domain
+- [ ] Kết luận có ít nhất 1 cơ hội cụ thể dựa trên dữ liệu thực
+- [ ] Không có số liệu bịa đặt
 
-- [ ] Đủ 10 kết quả trong bảng (không thiếu dòng)
-- [ ] Phân tích title có ít nhất 2 trong 3 mục: trùng hoàn toàn / trùng cụm từ / domain trùng
-- [ ] Phần meta description có dữ liệu HOẶC ghi rõ lý do không có
-- [ ] Bảng nội dung trùng lặp có ít nhất 1 nhóm được phân loại
-- [ ] Phần "Kết luận & Cơ hội" có ít nhất 1 cơ hội cụ thể được chỉ ra
-- [ ] Không có thông tin bịa đặt — chỉ dựa vào dữ liệu thực từ Ahrefs và WebFetch
+## Skill files
+
+| File | Purpose | Khi nào load |
+|---|---|---|
+| `check-top-10-evals.md` | 3 test scenarios | Khi cần test skill hoạt động đúng |

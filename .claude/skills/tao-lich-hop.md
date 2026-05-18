@@ -1,102 +1,115 @@
 ---
 name: tao-lich-hop
-description: Tạo lịch họp trên Google Calendar cho nguyenvanphuc@seongon.com — tự động gửi invite đến người tham dự. Dùng: /tao-lich-hop <tên cuộc họp> | <thời gian> | <email người họp,...>
-argument-hint: "<tên cuộc họp> | <thời gian bắt đầu> | <thời gian kết thúc> | <email1,email2,...>"
+description: This skill should be used when the user asks to "tạo lịch họp", "đặt lịch họp", "tạo meeting", "create a meeting", "schedule a call", "lên lịch gặp", "/tao-lich-hop", or wants to create a Google Calendar event and automatically send invites to attendees. Creates the event in nguyenvanphuc@seongon.com's calendar via Google Calendar MCP and sends email invitations. Use whenever scheduling any meeting or call that requires calendar invites.
 tools: mcp__claude_ai_Google_Calendar
 ---
 
-# /tao-lich-hop — Tạo lịch họp Google Calendar
+# tao-lich-hop
 
-Nhận `$ARGUMENTS` với cấu trúc phân cách bằng `|`:
+Tạo sự kiện họp trên Google Calendar cho nguyenvanphuc@seongon.com và tự động gửi email invite đến tất cả người tham dự. Hỗ trợ thời gian dạng tự nhiên (tiếng Việt), tự chuyển sang UTC+7.
+
+## Khi nào dùng
+
+User nói một trong các pattern:
+- `/tao-lich-hop [tên] | [bắt đầu] | [kết thúc] | [email,...]`
+- "tạo lịch họp [tên cuộc họp]"
+- "đặt meeting lúc [giờ] với [người]"
+- "lên lịch gặp [tên] vào [thời gian]"
+- "create a meeting with [person] at [time]"
+
+KHÔNG dùng skill này khi:
+- Google Calendar chưa xác thực → hướng dẫn auth trước
+- User chỉ muốn xem lịch hiện có → dùng tool list_events trực tiếp
+- Sự kiện không cần invite (ghi nhớ cá nhân) → gợi ý tạo thủ công
+
+## Default settings
+
+| Setting | Default | Override khi |
+|---|---|---|
+| Organizer | `nguyenvanphuc@seongon.com` | Không override — luôn thêm |
+| Thời lượng | 1 tiếng | User chỉ định thời gian kết thúc |
+| Timezone | Asia/Ho_Chi_Minh (UTC+7) | User chỉ định timezone khác |
+| Send invites | true | Không override — luôn gửi |
+| Ngôn ngữ confirm | Tiếng Việt | User giao tiếp tiếng Anh |
+
+## Pipeline — 5 bước
+
+Theo thứ tự, không skip.
+
+### Bước 1 — Phân tích đầu vào
+
+Tách argument phân cách bằng `|`:
+- Phần 1 → `MEETING_TITLE`
+- Phần 2 → `START_TIME`
+- Phần 3 → `END_TIME` (nếu thiếu: START_TIME + 1 tiếng)
+- Phần 4 → `ATTENDEES` (danh sách email, phân cách bằng dấu phẩy)
+
+Nếu thiếu phần nào trong 1, 2, 4: hỏi lại đúng phần còn thiếu, không hỏi lại toàn bộ.
+Nếu thời gian mơ hồ ("chiều mai", "cuối tuần"): xác nhận ngày giờ cụ thể trước khi tiếp tục.
+
+### Bước 2 — Kiểm tra xác thực
+
+Load schema: `ToolSearch` với `select:mcp__claude_ai_Google_Calendar__create_event`.
+
+Nếu nhận lỗi authentication:
+1. Thông báo: "Google Calendar chưa được kết nối. Gõ `/mcp` -> chọn 'claude.ai Google Calendar' để xác thực."
+2. Dừng lại, chờ user xác thực xong.
+
+### Bước 3 — Chuyển đổi thời gian
+
+Chuyển `START_TIME` và `END_TIME` sang ISO 8601 timezone Asia/Ho_Chi_Minh:
+- `20/05/2026 14:00` -> `2026-05-20T14:00:00+07:00`
+- "ngày mai 3 giờ chiều" -> xác nhận ngày cụ thể với user trước
+
+Kiểm tra: END_TIME phải sau START_TIME. Nếu không: báo lỗi + hỏi lại END_TIME.
+
+### Bước 4 — Tạo sự kiện
+
+Gọi `mcp__claude_ai_Google_Calendar__create_event` với:
 
 ```
-/tao-lich-hop Họp kế hoạch Q3 | 20/05/2026 14:00 | 20/05/2026 15:00 | abc@gmail.com, xyz@seongon.com
+title              : MEETING_TITLE
+start_time         : START_TIME (ISO 8601 UTC+7)
+end_time           : END_TIME   (ISO 8601 UTC+7)
+attendees          : [nguyenvanphuc@seongon.com] + ATTENDEES
+description        : "Lịch họp được tạo qua Claude Code"
+send_notifications : true
 ```
 
----
-
-## BƯỚC 1 — Phân tích đầu vào
-
-Tách `$ARGUMENTS` theo dấu `|` thành:
-- `MEETING_TITLE` : phần 1 — tên cuộc họp
-- `START_TIME`    : phần 2 — thời gian bắt đầu (định dạng DD/MM/YYYY HH:MM hoặc tự nhiên như "ngày mai 3h chiều")
-- `END_TIME`      : phần 3 — thời gian kết thúc (nếu không có, mặc định = START_TIME + 1 tiếng)
-- `ATTENDEES`     : phần 4 — danh sách email phân cách bằng dấu phẩy
-
-> Nếu người dùng không điền đủ 4 phần, hỏi lại phần còn thiếu trước khi tiếp tục.
-
-**Luôn thêm `nguyenvanphuc@seongon.com` vào danh sách attendees** (organizer).
-
----
-
-## BƯỚC 2 — Kiểm tra xác thực
-
-Thử gọi bất kỳ Calendar tool nào. Nếu nhận được lỗi authentication:
-1. Thông báo: *"Google Calendar chưa được kết nối. Bạn gõ `/mcp` → chọn 'claude.ai Google Calendar' để xác thực nhé!"*
-2. Dừng lại, chờ người dùng xác thực xong rồi tiếp tục.
-
----
-
-## BƯỚC 3 — Chuyển đổi thời gian
-
-Chuyển `START_TIME` và `END_TIME` sang định dạng ISO 8601:
-- Múi giờ: **Asia/Ho_Chi_Minh (UTC+7)**
-- Ví dụ: `20/05/2026 14:00` → `2026-05-20T14:00:00+07:00`
-- Nếu chỉ có ngày, không có giờ: hỏi lại giờ bắt đầu
-
----
-
-## BƯỚC 4 — Tạo sự kiện Calendar
-
-Gọi tool tạo sự kiện Google Calendar với các tham số:
-
-```
-title       : MEETING_TITLE
-start       : START_TIME (ISO 8601, timezone Asia/Ho_Chi_Minh)
-end         : END_TIME   (ISO 8601, timezone Asia/Ho_Chi_Minh)
-attendees   : [nguyenvanphuc@seongon.com] + ATTENDEES (tách bởi dấu phẩy)
-description : "Lịch họp được tạo tự động qua Claude Code"
-send_notifications : true   ← BẮT BUỘC để gửi invite email
-```
-
-> Google Calendar tự động gửi email invite đến tất cả attendees khi `send_notifications = true`.
-
----
-
-## BƯỚC 5 — Xuất kết quả
+### Bước 5 — Xác nhận kết quả
 
 Sau khi tạo thành công, trình bày:
 
 ```
-✅ Đã tạo lịch họp thành công!
+Da tao lich hop thanh cong.
 
-📅 Tên:        [MEETING_TITLE]
-🕐 Bắt đầu:   [START_TIME dạng DD/MM/YYYY HH:MM]
-🕑 Kết thúc:  [END_TIME dạng DD/MM/YYYY HH:MM]
-👥 Người dự:  [liệt kê từng email]
-📧 Invite:    Đã gửi email mời đến tất cả người tham dự
-🔗 Link:      [event link nếu có]
+Ten:       [MEETING_TITLE]
+Bat dau:   [DD/MM/YYYY HH:MM]
+Ket thuc:  [DD/MM/YYYY HH:MM]
+Nguoi du:  [liet ke tung email]
+Invite:    Da gui email moi den [so luong] nguoi tham du
+Link:      [event link neu co]
 ```
 
----
+Nếu tool không trả về event link: bỏ dòng Link, vẫn xác nhận tạo thành công.
 
-## VẾT XE ĐỔ — Lỗi thường gặp
+## Anti-patterns
 
-| Lỗi | Cách xử lý |
-|-----|-----------|
-| Chưa xác thực Google Calendar | Hướng dẫn: `/mcp` → chọn "claude.ai Google Calendar" |
-| `$ARGUMENTS` thiếu phần | Hỏi lại đúng phần còn thiếu, không hỏi lại toàn bộ |
-| Email sai định dạng | Báo cụ thể email nào sai, đề nghị sửa |
-| Thời gian kết thúc trước thời gian bắt đầu | Báo lỗi + hỏi lại thời gian kết thúc |
-| Thời gian không rõ (vd: "chiều mai") | Xác nhận lại ngày giờ cụ thể với người dùng trước khi tạo |
-| Tool không trả về event link | Bỏ qua dòng "Link", vẫn xác nhận tạo thành công |
+- KHÔNG tạo event khi thời gian chưa được xác nhận. BAD: dùng "ngày mai" mà không hỏi ngày cụ thể. GOOD: "Bạn muốn đặt vào ngày [ngày cụ thể] đúng không?"
+- KHÔNG bỏ `nguyenvanphuc@seongon.com` khỏi attendees. BAD: chỉ gửi invite cho người khác. GOOD: luôn thêm organizer vào danh sách.
+- KHÔNG dùng `send_notifications: false`. BAD: tạo event mà không gửi invite. GOOD: luôn set true.
+- KHÔNG hỏi lại toàn bộ khi thiếu 1 phần. BAD: "Bạn chưa cung cấp đủ thông tin, hãy nhập lại từ đầu". GOOD: "Bạn chưa cung cấp email người tham dự — email là gì?"
 
----
+## Tiêu chí chất lượng
 
-## TIÊU CHÍ CHẤT LƯỢNG — Tự kiểm trước khi trả lời
+- [ ] `nguyenvanphuc@seongon.com` luôn có trong attendees
+- [ ] Thời gian đã chuyển đúng sang UTC+7 trước khi gọi tool
+- [ ] `send_notifications: true` được truyền vào
+- [ ] Thời gian mơ hồ đã được xác nhận với user trước khi tạo
+- [ ] Output xác nhận hiển thị đủ: tên, giờ, người dự, trạng thái invite
 
-- [ ] `nguyenvanphuc@seongon.com` luôn có trong danh sách attendees
-- [ ] Thời gian đã chuyển đúng sang UTC+7
-- [ ] `send_notifications = true` được truyền vào (để gửi invite)
-- [ ] Đã xác nhận lại với người dùng nếu thời gian mơ hồ
-- [ ] Output hiển thị đầy đủ: tên, giờ, người dự, trạng thái invite
+## Skill files
+
+| File | Purpose | Khi nào load |
+|---|---|---|
+| `tao-lich-hop-evals.md` | 3 test scenarios | Khi cần test skill hoạt động đúng |
