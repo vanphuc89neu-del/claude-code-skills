@@ -17,7 +17,7 @@ User nói một trong các pattern:
 - "check competitors Google [keyword]"
 
 KHÔNG dùng skill này khi:
-- User muốn audit 1 bài viết cụ thể → dùng `/check-seo-post`
+- User muốn audit 1 bài viết cụ thể → dùng `/phan-tich-content-top-10`
 - User muốn research keyword cluster rộng (>1 từ khóa)
 - Ahrefs MCP chưa kết nối
 
@@ -98,6 +98,20 @@ Trình bày đúng cấu trúc sau, không thêm không bớt:
 - Góc độ còn bỏ trống: ...
 - Điểm yếu đối thủ (DR thấp, 0 backlink): ...
 - Nên tránh (đã bão hòa): ...
+
+---
+
+## Danh sách URL để phân tích
+1. [url vị trí 1]
+2. [url vị trí 2]
+3. [url vị trí 3]
+4. [url vị trí 4]
+5. [url vị trí 5]
+6. [url vị trí 6]
+7. [url vị trí 7]
+8. [url vị trí 8]
+9. [url vị trí 9]
+10. [url vị trí 10]
 ```
 
 Nếu `render-data-table` bị từ chối: fallback sang markdown table, không báo lỗi cho user.
@@ -120,4 +134,4 @@ Nếu `render-data-table` bị từ chối: fallback sang markdown table, không
 
 | File | Purpose | Khi nào load |
 |---|---|---|
-| `check-top-10-evals.md` | 3 test scenarios | Khi cần test skill hoạt động đúng |
+| `evals.md` | 3 test scenarios | Khi cần test skill hoạt động đúng |

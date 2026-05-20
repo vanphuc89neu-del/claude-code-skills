@@ -1,5 +1,5 @@
 # TIÊU CHUẨN BÀI ĐĂNG TẠI SEONGON
-# File này được load on-demand bởi skill /check-seo-post
+# File này được load on-demand bởi skill /phan-tich-content-top-10
 # Tổng: 53 tiêu chí — mỗi tiêu chí = 100/53 ≈ 1.89 điểm
 
 ## SCORING RULES
